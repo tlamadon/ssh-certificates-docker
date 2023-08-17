@@ -1,0 +1,17 @@
+# Docker file for server
+FROM alpine
+
+# Install OpenSSH:
+RUN apk -U add openssh
+# RUN apk -U add openrc 
+
+# Generate host keys:
+RUN ssh-keygen -A
+
+# share public key with CA
+# RUN mkdir /network-server
+# RUN cp /etc/ssh/ssh_host_ecdsa_key.pub /network-server/
+
+# Create user1
+RUN addgroup -S sshgrp && adduser -S user1 -G sshgrp -s /bin/sh 
+RUN echo "user1:user1" | chpasswd user1

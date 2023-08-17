@@ -1,0 +1,27 @@
+FROM alpine
+
+#STOPSIGNAL SIGINT
+
+# Install OpenSSH:
+RUN apk -U add openssh
+
+# Generate host keys:
+RUN ssh-keygen -A
+
+# Create a user
+# RUN addgroup -S sshgrp && adduser -D -G sshgrp -s /bin/sh user1
+RUN adduser -D -s /bin/sh user1
+RUN echo "user1:user1" | chpasswd user1
+
+RUN mkdir /network-client
+RUN chmod a+rwx /network-client
+
+# Create his key 
+USER user1
+WORKDIR /home/user1
+RUN mkdir .ssh
+
+# Generate a user1 key and share it to the CA
+RUN ssh-keygen -f user1 -C user1 -N ""
+RUN mv user* .ssh
+# RUN cp .ssh/user1.pub /network-client/user1.pub

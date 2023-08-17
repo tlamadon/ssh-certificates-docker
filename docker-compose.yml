@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+
+  # Our client container.  We'll SSH form here.
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+    image: client 
+    container_name: client
+    hostname: client
+    command: /bin/sh -c 'trap exit INT TERM; while true; do sleep 1; done;'
+    volumes:
+      - shared-ca-client:/network-client 
+
+  server:
+    # Our server container.  This will accept SSH keys.
+    # Docs for this excelent container available at:
+    # https://github.com/panubo/docker-sshd
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+
+    container_name: server
+    hostname: server
+
+    command: /usr/sbin/sshd -D -e -f /etc/ssh/sshd_config
+
+    environment:
+      - SSH_ENABLE_ROOT=true
+
+    volumes:
+      - shared-ca-server:/network-server 
+
+  ca:
+    # Our ca container.  This will only accept SSH keys signed with the CA.
+    # Docs for this excelent container available at:
+    # https://github.com/panubo/docker-sshd
+    build:
+      context: .
+      dockerfile: Dockerfile-ca
+    
+    container_name: ca-server
+    hostname: ca-server
+
+    command: /bin/sh -c 'trap exit INT TERM; while true; do sleep 1; done;'
+
+    environment:
+      - SSH_ENABLE_ROOT=true
+
+    volumes:
+      - shared-ca-client:/network-client
+      - shared-ca-server:/network-server 
+
+volumes:
+  shared-ca-client:
+  shared-ca-server:
+
