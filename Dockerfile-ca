@@ -1,21 +1,9 @@
 FROM alpine
 
-#STOPSIGNAL SIGINT
-
 # Install OpenSSH:
 RUN apk -U add openssh
-
-# Generate host keys:
-RUN ssh-keygen -A
 
 WORKDIR /ssh
 
 # Generate a CA key:
 RUN ssh-keygen -f /etc/ssh/ca -C ca -N ""
-
-# Share public key with bothe server and client
-# RUN mkdir /network-client
-# RUN cp /etc/ssh/ca.pub /network-client/ca.pub
-
-# RUN mkdir /network-server
-# RUN cp /etc/ssh/ca.pub /network-server/ca.pub
